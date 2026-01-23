@@ -1,0 +1,206 @@
+[
+  {
+    "id": 1769021063915,
+    "userId": 1769020086308,
+    "date": "2026-01-21T18:44:23.915Z",
+    "status": "Pendiente",
+    "total": 29.99,
+    "items": [
+      {
+        "id": "p1",
+        "title": "Camisa clásica",
+        "price": 29.99,
+        "img": "images/2.png",
+        "qty": 1
+      }
+    ],
+    "shippingAddress": "Dirección del perfil (Pendiente)"
+  },
+  {
+    "id": 1769021746752,
+    "userId": 1769020086308,
+    "date": "2026-01-21T18:55:46.752Z",
+    "status": "Pendiente",
+    "total": 49.99,
+    "items": [
+      {
+        "id": "p2",
+        "title": "Pantalón urbano",
+        "price": 49.99,
+        "img": "images/3.png",
+        "qty": 1
+      }
+    ],
+    "shippingAddress": "Dirección del perfil (Pendiente)"
+  },
+  {
+    "id": 1769024728667,
+    "userId": 1769020086308,
+    "date": "2026-01-21T19:45:28.667Z",
+    "status": "Pendiente",
+    "total": 14.99,
+    "items": [
+      {
+        "id": "p7",
+        "title": "Gorra clásica",
+        "price": 14.99,
+        "img": "images/4.png",
+        "qty": 1
+      }
+    ]
+  },
+  {
+    "id": 1769024763835,
+    "userId": 1769020086308,
+    "date": "2026-01-21T19:46:03.835Z",
+    "status": "Pendiente",
+    "total": 49.99,
+    "items": [
+      {
+        "id": "p2",
+        "title": "Pantalón urbano",
+        "price": 49.99,
+        "img": "images/3.png",
+        "qty": 1
+      }
+    ]
+  },
+  {
+    "id": "1769090271161",
+    "userId": 1769089581923,
+    "items": [
+      {
+        "id": "p1",
+        "title": "Camisa clásica",
+        "price": 29.99,
+        "qty": 2
+      },
+      {
+        "id": "p3",
+        "title": "Chaqueta ligera",
+        "price": 79.99,
+        "qty": 1
+      }
+    ],
+    "total": 139.97,
+    "shippingAddress": "lejos",
+    "status": "Entregado",
+    "createdAt": "2026-01-22T13:57:51.161Z",
+    "updatedAt": "2026-01-22T16:18:58.683Z"
+  },
+  {
+    "id": "1769098617776",
+    "userId": 1769089581923,
+    "items": [
+      {
+        "id": "p1",
+        "title": "Camisa clásica",
+        "price": 29.99,
+        "qty": 1
+      }
+    ],
+    "total": 29.99,
+    "shippingAddress": "lejos",
+    "status": "Entregado",
+    "createdAt": "2026-01-22T16:16:57.776Z",
+    "updatedAt": "2026-01-22T17:04:30.720Z"
+  },
+  {
+    "id": "1769101581839",
+    "userId": 1769089581923,
+    "items": [
+      {
+        "id": "p1",
+        "title": "Camisa clásica",
+        "price": 29.99,
+        "qty": 1
+      }
+    ],
+    "total": 29.99,
+    "shippingAddress": "lejos",
+    "status": "Entregado",
+    "createdAt": "2026-01-22T17:06:21.839Z",
+    "statusHistory": [
+      {
+        "from": "Pendiente",
+        "to": "Entregado",
+        "date": "2026-01-22T18:12:34.240Z",
+        "updatedBy": "admin@acme.com"
+      }
+    ],
+    "updatedAt": "2026-01-22T18:12:34.240Z"
+  },
+  {
+    "id": "1769101589828",
+    "userId": 1769089581923,
+    "items": [
+      {
+        "id": "p1",
+        "title": "Camisa clásica",
+        "price": 29.99,
+        "qty": 1
+      }
+    ],
+    "total": 29.99,
+    "shippingAddress": "lejos",
+    "status": "Entregado",
+    "createdAt": "2026-01-22T17:06:29.828Z",
+    "statusHistory": [
+      {
+        "from": "Pendiente",
+        "to": "Enviado",
+        "date": "2026-01-22T18:12:20.966Z",
+        "updatedBy": "admin@acme.com"
+      },
+      {
+        "from": "Enviado",
+        "to": "Entregado",
+        "date": "2026-01-22T18:12:30.975Z",
+        "updatedBy": "admin@acme.com"
+      }
+    ],
+    "updatedAt": "2026-01-22T18:12:30.975Z"
+  },
+  {
+    "id": "1769105395820",
+    "userId": 1769089581923,
+    "items": [
+      {
+        "id": "p1",
+        "title": "Camisa clásica",
+        "price": 29.99,
+        "qty": 1
+      }
+    ],
+    "total": 29.99,
+    "shippingAddress": "lejos",
+    "status": "Entregado",
+    "createdAt": "2026-01-22T18:09:55.820Z",
+    "statusHistory": [
+      {
+        "status": "Pendiente",
+        "date": "2026-01-22T18:09:55.820Z",
+        "note": "Pedido creado por el usuario"
+      },
+      {
+        "from": "Pendiente",
+        "to": "Entregado",
+        "date": "2026-01-22T18:12:46.201Z",
+        "updatedBy": "admin@acme.com"
+      },
+      {
+        "from": "Entregado",
+        "to": "Enviado",
+        "date": "2026-01-22T18:12:54.425Z",
+        "updatedBy": "admin@acme.com"
+      },
+      {
+        "from": "Enviado",
+        "to": "Entregado",
+        "date": "2026-01-22T18:13:19.955Z",
+        "updatedBy": "admin@acme.com"
+      }
+    ],
+    "updatedAt": "2026-01-22T18:13:19.955Z"
+  }
+]

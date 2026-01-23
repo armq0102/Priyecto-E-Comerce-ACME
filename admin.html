@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACME Admin Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+    <!-- LOADING SPINNER -->
+    <div id="loadingOverlay" class="hidden"><div class="spinner"></div></div>
+
+    <!-- LOGIN VIEW -->
+    <section id="loginView">
+        <div class="login-card">
+            <h1>ACME Admin</h1>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Correo Electrónico</label>
+                    <input type="email" id="email" required placeholder="admin@acme.com">
+                </div>
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" required placeholder="••••••••">
+                </div>
+                <div id="loginError" class="error-msg"></div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Ingresar</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- DASHBOARD VIEW (Move outside the login form) -->
+    <section id="dashboardView" class="hidden">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">ACME ADMIN</div>
+            <nav>
+                <a href="#" class="nav-link active" onclick="showSection('inventory')">📦 Inventario</a>
+                <a href="#" class="nav-link" onclick="showSection('orders')">📄 Pedidos</a>
+                <a href="#" class="nav-link" onclick="showSection('users')">👥 Usuarios</a>
+            </nav>
+            <div class="sidebar-footer">
+                <button onclick="logout()" class="btn btn-outline" style="color: white; border-color: rgba(255,255,255,0.3); width: 100%;">Cerrar Sesión</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="header-bar">
+                <h2 id="sectionTitle" class="page-title">Inventario</h2>
+                <div class="user-info">Logueado como Admin</div>
+            </div>
+
+            <!-- INVENTORY SECTION -->
+            <div id="inventorySection">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <h3 style="margin:0;">Listado de Productos</h3>
+                    <button class="btn btn-primary" onclick="openProductModal(null)">➕ Nuevo Producto</button>
+                </div>
+                <!-- Buscador en tiempo real -->
+                <div style="margin-bottom: 20px;">
+                    <input type="text" placeholder="🔍 Buscar producto por nombre o ID..." 
+                           style="width: 100%; max-width: 300px; padding: 10px; border: 1px solid #ddd; border-radius: 4px;"
+                           oninput="AdminUI.inventory.filter(this.value)">
+                </div>
+                <div class="table-container">
+                    <table id="productsTable">
+                        <thead>
+                            <tr>
+                                <th>Img</th>
+                                <th>Producto</th>
+                                <th>Precio</th>
+                                <th>Stock</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody><!-- Dynamic Content --></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ORDERS SECTION -->
+            <div id="ordersSection" class="hidden">
+                <div class="table-container">
+                    <table id="ordersTable">
+                        <thead>
+                            <tr>
+                                <th>ID Pedido</th>
+                                <th>Usuario</th>
+                                <th>Total</th>
+                                <th>Fecha</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody><!-- Dynamic Content --></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- USERS SECTION (Extra) -->
+            <div id="usersSection" class="hidden">
+                <div class="table-container">
+                    <table id="usersTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Rol</th>
+                            </tr>
+                        </thead>
+                        <tbody><!-- Dynamic Content --></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </section>
+
+    <!-- MODAL: PRODUCTO (CREAR / EDITAR) -->
+    <div id="productModal" class="modal-backdrop">
+        <div class="modal">
+            <h2 id="productModalTitle">Producto</h2>
+            <form id="productForm">
+                <div class="form-group">
+                    <label>Nombre del Producto</label>
+                    <input type="text" id="prodName" required>
+                </div>
+                <div class="form-row" style="display:flex; gap:10px;">
+                    <div class="form-group" style="flex:1;"><label>Precio</label><input type="number" id="prodPrice" min="0.01" step="0.01" required></div>
+                    <div class="form-group" style="flex:1;"><label>Stock</label><input type="number" id="prodStock" min="0" required></div>
+                </div>
+                <div class="form-group"><label>URL Imagen</label><input type="url" id="prodImage" required placeholder="https://..."></div>
+                <div class="form-group">
+                    <label>Estado</label>
+                    <select id="prodStatus"><option value="active">Activo</option><option value="hidden">Oculto</option><option value="out_of_stock">Agotado</option></select>
+                </div>
+            </form>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeModal('productModal')">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="saveProductBtn">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: EDIT ORDER STATUS (Move outside the login form) -->
+    <div id="statusModal" class="modal-backdrop">
+        <div class="modal">
+            <h2>Cambiar Estado del Pedido</h2>
+            <p id="statusModalOrderId" style="margin-bottom: 15px; color: #666;"></p>
+            <div class="form-group">
+                <label>Seleccionar Estado</label>
+                <select id="newStatusSelect" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ddd;">
+                    <option value="Pendiente">Pendiente</option>
+                    <option value="Enviado">Enviado</option>
+                    <option value="Entregado">Entregado</option>
+                    <option value="Cancelado">Cancelado</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeModal('statusModal')">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="confirmStatusBtn">Actualizar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>

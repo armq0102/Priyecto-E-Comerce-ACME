@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - ACME</title>
+    <link rel="stylesheet" href="STYLE.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="main-header">
+        <div class="container header-content">
+            <a href="index.html" class="logo">ACME</a>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="hombres.html">Hombres</a></li>
+                    <li><a href="mujeres.html">Mujeres</a></li>
+                    <li><a href="accesorios.html">Accesorios</a></li>
+                </ul>
+            </nav>
+            <div class="header-icons">
+                <a href="index.html#buscar" class="icon-link open-search">🔍 Buscar</a>
+                <a href="#" class="icon-link open-cart">🛒 Carrito <span id="cartCount" class="cart-count">0</span></a>
+                <div class="user-menu">
+                    <a href="#" class="user-toggle" id="userToggle">
+                        <span class="user-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="8" r="3.2"/><path d="M4.5 20c0-3.6 3.6-6.2 7.5-6.2s7.5 2.6 7.5 6.2"/></svg></span>
+                    </a>
+                    <div class="user-dropdown" id="userDropdown">
+                        <a href="#" id="menuOpenLogin">Iniciar sesión</a>
+                        <a href="#" id="menuOpenRegister">Crear cuenta</a>
+                        <a href="profile.html" id="menuOpenAccount" class="hidden">Mi Perfil</a>
+                        <a href="profile.html#orders" id="menuMyOrders" class="hidden">Mis Pedidos</a>
+                        <a href="#" id="menuLogout" class="hidden">Cerrar Sesión</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" style="padding: 40px 20px;">
+        <div class="profile-layout">
+            <!-- Barra Lateral -->
+            <aside class="profile-sidebar">
+                <div class="user-summary">
+                    <div class="avatar-circle" id="profileAvatar">U</div>
+                    <div class="user-info">
+                        <h3 id="profileNameDisplay">Cargando...</h3>
+                        <span id="profileEmailDisplay">...</span>
+                    </div>
+                </div>
+                <nav class="profile-nav">
+                    <a href="#datos" class="active" id="tabLinkDatos">👤 Mis Datos</a>
+                    <a href="#pedidos" id="tabLinkPedidos">📦 Mis Pedidos</a>
+                    <a href="#" id="sidebarLogout" style="color: var(--acme-red);">🚪 Cerrar Sesión</a>
+                </nav>
+            </aside>
+
+            <!-- Contenido Principal -->
+            <section class="profile-content">
+                <!-- Sección Datos -->
+                <div id="tabDatos" class="profile-section">
+                    <h2>Información Personal</h2>
+                    <form id="fullProfileForm" class="profile-form">
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label>Nombre</label>
+                                <input type="text" name="firstName" placeholder="Tu nombre">
+                            </div>
+                            <div class="input-group">
+                                <label>Apellido</label>
+                                <input type="text" name="lastName" placeholder="Tu apellido">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label>Correo Electrónico</label>
+                                <input type="email" name="email" disabled style="background:#f4f4f4; cursor:not-allowed;">
+                            </div>
+                            <div class="input-group">
+                                <label>Teléfono</label>
+                                <input type="tel" name="phone" placeholder="+1 234 567 890">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>Dirección de Envío</label>
+                            <textarea name="address" rows="3" placeholder="Calle, número, ciudad, código postal..."></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-dark">Guardar Cambios</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Sección Pedidos -->
+                <div id="tabPedidos" class="profile-section hidden">
+                    <h2>Historial de Pedidos</h2>
+                    <div id="profileOrdersTableContainer">
+                        <p>Cargando tus pedidos...</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <div class="container">
+            <p>&copy; 2024 ACME Corporation. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="auth.js"></script>
+</body>
+</html>

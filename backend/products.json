@@ -1,0 +1,67 @@
+[
+  {
+    "id": "p1",
+    "title": "Camisa clásica",
+    "price": 29.99,
+    "stock": 0,
+    "updatedAt": "2026-01-22T17:17:51.892Z",
+    "img": "undefined",
+    "status": "active"
+  },
+  {
+    "id": "p2",
+    "title": "Pantalón urbano",
+    "price": 49.99,
+    "stock": 12,
+    "updatedAt": "2026-01-22T16:17:35.481Z"
+  },
+  {
+    "id": "p3",
+    "title": "Chaqueta ligera",
+    "price": 79.99,
+    "stock": 12,
+    "updatedAt": "2026-01-22T16:17:38.483Z"
+  },
+  {
+    "id": "p4",
+    "title": "Vestido veraniego",
+    "price": 39.99,
+    "stock": 12,
+    "updatedAt": "2026-01-22T16:17:41.179Z"
+  },
+  {
+    "id": "p5",
+    "title": "Blusa estampada",
+    "price": 24.99,
+    "stock": 12,
+    "updatedAt": "2026-01-22T16:17:43.537Z"
+  },
+  {
+    "id": "p6",
+    "title": "Falda midi",
+    "price": 34.99,
+    "stock": 12,
+    "updatedAt": "2026-01-22T16:17:45.863Z"
+  },
+  {
+    "id": "p7",
+    "title": "Gorra clásica",
+    "price": 14.99,
+    "stock": 10,
+    "updatedAt": "2026-01-22T16:30:45.886Z"
+  },
+  {
+    "id": "p8",
+    "title": "Bolso de mano",
+    "price": 49.99,
+    "stock": 10,
+    "updatedAt": "2026-01-22T17:04:19.063Z"
+  },
+  {
+    "id": "p9",
+    "title": "Cinturón de cuero",
+    "price": 24.99,
+    "stock": 12,
+    "updatedAt": "2026-01-22T16:17:53.231Z"
+  }
+]

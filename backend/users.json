@@ -1,0 +1,18 @@
+[
+  {
+    "id": "admin-1",
+    "name": "Administrador",
+    "email": "admin@acme.com",
+    "password": "$2b$10$a/9xwRzE0A.5we9V9t8XdOH4cPI0mumNZN1dnGgzTXDn7.6CJ2RF6",
+    "role": "admin"
+  },
+  {
+    "id": 1769089581923,
+    "name": "Usuario de Prueba",
+    "email": "test@test.com",
+    "password": "$2b$10$cdNNSaH526QuzLV7.av8Cueq4OHGrSfTQ1E3m/uHf0mAkzzpPeES2",
+    "role": "user",
+    "phone": "454532",
+    "address": "lejos"
+  }
+]
