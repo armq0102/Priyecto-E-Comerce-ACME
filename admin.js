@@ -3,6 +3,7 @@ const API_URL = 'http://localhost:3000/api';
 
 // --- STATE ---
 let currentProductToEdit = null;
+let currentAdminId = null;
 let currentOrderToEdit = null;
 let currentSection = localStorage.getItem('acme_admin_section') || 'inventory';
 
@@ -21,12 +22,22 @@ function init() {
                     token = mainToken;
                     localStorage.setItem('acme_admin_token', token); // Guardar para esta sesión
                 }
-            } catch (e) {}
+            } catch (e) {
+                // Ignorar error si el token de la tienda no es válido o no es de admin
+            }
         }
     }
 
     if (token) {
-        showDashboard();
+        try {
+            // Decodificar token para obtener el ID del admin y aplicar regla de autoprotección
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            currentAdminId = payload.userId;
+            showDashboard();
+        } catch (e) {
+            console.error("Token de admin inválido, cerrando sesión.");
+            logout();
+        }
     } else {
         showLogin();
     }
@@ -161,12 +172,15 @@ const AdminUI = {
         },
         render(products) {
             const tbody = document.querySelector('#productsTable tbody');
-            tbody.innerHTML = products.map(p => `
+            tbody.innerHTML = products.map(p => {
+                // CAMBIO 1: Usar un ID defensivo y mostrarlo.
+                const productId = p._id || p.id;
+                return `
                 <tr>
                     <td><img src="${p.img}" class="product-thumb" alt="img"></td>
                     <td>
                         <div style="font-weight:600">${p.title}</div>
-                        <small style="color:#888">ID: ${p.id}</small>
+                        <small style="color:#888">ID: ${productId}</small>
                     </td>
                     <td>$${p.price.toFixed(2)}</td>
                     <td><span class="badge ${p.stock > 5 ? 'badge-success' : 'badge-danger'}">${p.stock} unid.</span></td>
@@ -174,14 +188,16 @@ const AdminUI = {
                     <td>
                         <button class="btn btn-sm btn-outline" onclick='openProductModal(${JSON.stringify(p)})'>✏️ Editar</button>
                     </td>
-                </tr>
-            `).join('');
+                </tr>`;
+            }).join('');
         },
         filter(query) {
-            const filtered = this.data.filter(p => 
-                p.title.toLowerCase().includes(query.toLowerCase()) || 
-                p.id.toLowerCase().includes(query.toLowerCase())
-            );
+            const lowerCaseQuery = query.toLowerCase();
+            const filtered = this.data.filter(p => {
+                const productId = p._id || p.id;
+                return p.title.toLowerCase().includes(lowerCaseQuery) ||
+                       (productId && productId.toString().toLowerCase().includes(lowerCaseQuery));
+            });
             this.render(filtered);
         }
     },
@@ -202,7 +218,32 @@ const AdminUI = {
                 if (o.status === 'Enviado') badgeClass = 'badge-info';
                 if (o.status === 'Entregado') badgeClass = 'badge-success';
                 if (o.status === 'Cancelado') badgeClass = 'badge-danger';
-                return `<tr><td><small>#${o.id}</small></td><td>${o.userId}</td><td>$${o.total.toFixed(2)}</td><td>${new Date(o.createdAt).toLocaleDateString()}</td><td><span class="badge ${badgeClass}">${o.status}</span></td><td><button class="btn btn-sm btn-outline" onclick="openStatusModal('${o.id}', '${o.status}')">🔄 Estado</button></td></tr>`;
+
+                // MEJORA 1: Mostrar resumen de productos, aprovechando el 'populate' del backend.
+                const productsSummary = o.items?.map(item => {
+                    const p = item.productId;
+                    if (!p) return '<span style="color: #999;">(Producto eliminado)</span>';
+                    // Usamos item.qty, que es la propiedad correcta del modelo Order.
+                    return `${p.title} (x${item.qty})`;
+                }).join('<br>') || '—';
+
+                // FIX 1: Mostrar el nombre del usuario en lugar del objeto.
+                // El backend popula `userId`, por lo que es un objeto con `name` y `email`.
+                const userName = o.userId ? (o.userId.name || o.userId.email) : 'Usuario no disponible';
+
+                // FIX 2: Usar `_id` ya que el modelo Order no tiene el virtual `id`.
+                // Esto asegura que siempre tengamos un ID válido para las operaciones.
+                const orderId = o._id || o.id;
+
+                return `<tr>
+                    <td><small>#${orderId.toString().substring(orderId.length - 7)}</small></td>
+                    <td>${userName}</td>
+                    <td>${productsSummary}</td>
+                    <td>$${o.total.toFixed(2)}</td>
+                    <td>${new Date(o.createdAt).toLocaleDateString()}</td>
+                    <td><span class="badge ${badgeClass}">${o.status}</span></td>
+                    <td><button class="btn btn-sm btn-outline" onclick="openStatusModal('${orderId}', '${o.status}')">🔄 Estado</button></td>
+                </tr>`;
             }).join('');
         }
     },
@@ -218,10 +259,55 @@ const AdminUI = {
         },
         render(users) {
             const tbody = document.querySelector('#usersTable tbody');
-            tbody.innerHTML = users.map(u => `<tr><td>${u.id}</td><td>${u.name || 'Sin nombre'}</td><td>${u.email}</td><td><span class="badge ${u.role === 'admin' ? 'badge-danger' : 'badge-info'}">${u.role}</span></td></tr>`).join('');
+            tbody.innerHTML = users.map(u => {
+                // CAMBIO 3: Usar _id y mostrar versión corta.
+                const userId = u._id || u.id;
+                const userStatus = u.status || 'active';
+
+                const roleBadge = `<span class="badge ${u.role === 'admin' ? 'badge-danger' : 'badge-info'}">${u.role}</span>`;
+                const statusBadge = `<span class="badge ${userStatus === 'active' ? 'badge-success' : 'badge-danger'}">${userStatus}</span>`;
+                
+                let actionButton = '';
+                // Regla de autoprotección: No mostrar botón para el admin actualmente logueado
+                if (userId !== currentAdminId) {
+                    const actionText = userStatus === 'active' ? 'Suspender' : 'Activar';
+                    const btnClass = userStatus === 'active' ? 'btn-outline-danger' : 'btn-outline-success';
+                    actionButton = `<button class="btn btn-sm ${btnClass}" onclick="toggleUserStatus('${userId}', '${userStatus}')">${actionText}</button>`;
+                } else {
+                    actionButton = '—'; // Placeholder para el admin actual
+                }
+
+                return `<tr>
+                    <td><small>#${userId.toString().substring(userId.length - 7)}</small></td>
+                    <td>${u.name || 'Sin nombre'}</td>
+                    <td>${u.email}</td>
+                    <td>${roleBadge}</td>
+                    <td>${statusBadge}</td>
+                    <td>${actionButton}</td>
+                </tr>`;
+            }).join('');
         }
     }
 };
+
+async function toggleUserStatus(userId, currentStatus) {
+    const newStatus = currentStatus === 'active' ? 'suspended' : 'active';
+    if (!confirm(`¿Estás seguro de que quieres ${newStatus === 'suspended' ? 'suspender' : 'reactivar'} a este usuario?`)) return;
+
+    setLoading(true);
+    const response = await fetchAdmin(`/users/${userId}/status`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status: newStatus })
+    });
+
+    if (response && response.ok) {
+        showToast('Estado del usuario actualizado.', 'success');
+        AdminUI.users.load();
+    } else {
+        showToast('Error al actualizar el estado del usuario.', 'error');
+    }
+    setLoading(false);
+}
 
 // --- MODAL ACTIONS ---
 
@@ -231,7 +317,7 @@ function openProductModal(product) {
     
     if (product) {
         // MODO EDITAR
-        currentProductToEdit = product.id;
+        currentProductToEdit = product._id || product.id;
         modalTitle.textContent = 'Editar Producto';
         document.getElementById('prodName').value = product.title;
         document.getElementById('prodPrice').value = product.price;

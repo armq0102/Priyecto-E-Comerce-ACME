@@ -24,6 +24,7 @@ router.get('/', async (req, res) => {
     try {
         const orders = await Order.find({})
             .populate('userId', 'name email')
+            .populate('items.productId', 'title img') // <-- CORRECCIÓN: Añadir esta línea
             .sort({ createdAt: -1 });
 
         res.json(orders);
