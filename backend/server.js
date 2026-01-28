@@ -25,6 +25,7 @@ app.use('/api/auth', require('./routes/auth.routes.js'));
 app.use('/api/orders', require('./routes/orders.routes.js'));
 app.use('/api/admin', require('./routes/admin.routes.js'));
 app.use('/api/products', require('./routes/products.routes.js'));
+app.use('/api/payments', require('./routes/payments.routes.js'));
 
 // Ruta principal
 app.get('/', (req, res) => {

@@ -5,6 +5,9 @@ const API_URL = window.location.hostname === 'localhost' || window.location.host
     ? 'http://localhost:3000/api'
     : '/api'; // URL relativa para producción
 
+// Tasa de cambio (temporal hasta que los precios en DB estén en COP)
+const USD_TO_COP = 5200;
+
 // Base de datos de productos (Coincide con los IDs de tus HTMLs)
 let PRODUCTS = []; // Ahora vacío, se llena desde el backend
 
@@ -30,6 +33,16 @@ function showToast(message, type = 'info') {
         toast.remove();
         if (container.childNodes.length === 0) container.remove();
     }, 3500);
+}
+
+// --- FUNCIÓN DE FORMATO DE MONEDA ---
+function formatCOP(value) {
+    return new Intl.NumberFormat('es-CO', {
+        style: 'currency',
+        currency: 'COP',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(value);
 }
 
 // --- SINCRONIZACIÓN CON BACKEND ---
@@ -59,10 +72,10 @@ function renderFeaturedProducts() {
                 ${isOutOfStock ? '<span class="badge-out-of-stock">Agotado</span>' : ''}
                 <img src="${p.img}" alt="${p.title}">
                 <h3>${p.title}</h3>
-                <p class="price">$${p.price.toFixed(2)}</p>
+                <p class="price">${formatCOP(p.price * USD_TO_COP)}</p>
                 ${isLowStock ? `<p style="color:var(--acme-red, #cc0000);font-weight:bold;font-size:0.85rem;margin-bottom:5px;">¡Solo quedan ${p.stock}!</p>` : ''}
-                <button class="btn btn-dark" 
-                        onclick="addToCart('${p.id}')" 
+                <button class="btn btn-dark add-to-cart"
+                        data-id="${p.id}"
                         ${isOutOfStock ? 'disabled' : ''}>
                     ${isOutOfStock ? 'Agotado' : 'Agregar al carrito'}
                 </button>
@@ -85,13 +98,13 @@ function updateCategoryPagesUI() {
             if (card) {
                 const title = card.querySelector('h3')?.textContent.trim();
                 if (title) {
-                    product = PRODUCTS.find(p => p.title === title);
+                    // FIX: Búsqueda insensible a mayúsculas para mayor robustez
+                    product = PRODUCTS.find(p => p.title.toLowerCase() === title.toLowerCase());
                     if (product) {
                         // ¡Encontrado! Actualizamos el botón con el ID real de Mongo
                         const realId = product.id || product._id;
                         console.log(`🔗 Vinculado: ${title} -> ${realId}`);
                         btn.setAttribute('data-id', realId);
-                        btn.setAttribute('onclick', `addToCart('${realId}')`);
                     }
                 }
             }
@@ -100,6 +113,13 @@ function updateCategoryPagesUI() {
         
         if (product && product.stock !== undefined) {
             const card = btn.closest('.product-card');
+
+            // --- MEJORA: Actualizar el precio dinámicamente ---
+            const priceEl = card.querySelector('p.price');
+            if (priceEl) {
+                priceEl.textContent = formatCOP(product.price * USD_TO_COP);
+            }
+            // ---------------------------------------------------
             
             // 1. Ocultar si está "hidden" (Soft Delete)
             if (product.status === 'hidden') {
@@ -259,14 +279,14 @@ function updateCartUI() {
     if (drawerContent && drawerTotal) {
         if (cart.length === 0) {
             drawerContent.innerHTML = '<p style="text-align:center; margin-top:20px; color:#666;">Tu carrito está vacío.</p>';
-            drawerTotal.textContent = 'Total: $0.00';
+            drawerTotal.textContent = `Total: ${formatCOP(0)}`;
         } else {
             drawerContent.innerHTML = cart.map(item => `
                 <div class="cart-item">
                     <img src="${item.img}" alt="${item.title}">
                     <div class="meta">
                         <div class="title">${item.title}</div>
-                        <div class="price">$${item.price.toFixed(2)}</div>
+                        <div class="price">${formatCOP(item.price * USD_TO_COP)}</div>
                         <div class="qty-controls">
                             <button class="qty-btn" onclick="changeQty('${item.id}', -1)">-</button>
                             <span class="qty-display">${item.qty}</span>
@@ -276,7 +296,7 @@ function updateCartUI() {
                     <button class="remove-item" onclick="removeFromCart('${item.id}')" aria-label="Eliminar">×</button>
                 </div>
             `).join('');
-            drawerTotal.textContent = `Total: $${total.toFixed(2)}`;
+            drawerTotal.textContent = `Total: ${formatCOP(total * USD_TO_COP)}`;
         }
     }
     
@@ -285,7 +305,7 @@ function updateCartUI() {
     if (modalContent) {
         modalContent.textContent = cart.length === 0 
             ? 'Tu carrito está vacío.' 
-            : `Tienes ${count} productos. Total: $${total.toFixed(2)}`;
+            : `Tienes ${count} productos. Total: ${formatCOP(total * USD_TO_COP)}`;
     }
 }
 
@@ -316,6 +336,9 @@ window.handleCheckout = async function() {
     console.log('Botón de pago presionado. Iniciando proceso...');
     const token = localStorage.getItem('acme_token');
     
+    // Debug: Verificar si el token existe antes de enviar
+    console.log('Token de autenticación:', token ? 'Presente' : 'Ausente');
+
     if (!token) {
         showToast('Debes iniciar sesión para comprar.', 'warning');
         // Intentar abrir modal de login usando la función global de auth.js
@@ -335,29 +358,51 @@ window.handleCheckout = async function() {
     try {
         // 1. Solicitar Transacción Wompi al Backend
         showToast('Redirigiendo a Wompi...', 'info');
+
+        const endpoint = `${API_URL}/payments/create-transaction`;
+        const payload = { 
+            items: cart,
+            redirectUrl: window.location.origin + '/profile.html#pedidos'
+        };
+
+        console.log('Enviando solicitud a:', endpoint);
+        console.log('Datos enviados (Payload):', payload);
         
-        const response = await fetch(`${API_URL}/payments/create-transaction`, {
+        const response = await fetch(endpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ 
-                items: cart,
-                redirectUrl: window.location.origin + '/profile.html#pedidos'
-            })
+            body: JSON.stringify(payload)
         });
+
+        console.log('Estado de la respuesta HTTP:', response.status);
+
+        // Verificar si la respuesta es JSON antes de parsear
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            const text = await response.text();
+            console.error('Respuesta no válida del servidor (No es JSON):', text);
+            throw new Error(`Error de comunicación con el servidor (Status: ${response.status})`);
+        }
 
         const data = await response.json();
 
         if (!response.ok) {
-            throw new Error(data.msg || 'Error al iniciar pago');
+            console.error('Error devuelto por el servidor:', data);
+            throw new Error(data.msg || data.message || 'Error al iniciar pago');
         }
+
+        console.log('Datos de la transacción recibidos:', data);
 
         // 2. Redirigir a Wompi Checkout
         if (data.redirectUrl) {
             localStorage.removeItem('acme_cart'); // Limpiamos carrito preventivamente
             window.location.href = data.redirectUrl;
+        } else {
+            console.error('Respuesta sin redirectUrl:', data);
+            throw new Error('No se recibió la URL de pago.');
         }
 
     } catch (error) {
@@ -417,4 +462,15 @@ document.addEventListener('DOMContentLoaded', () => {
             if(window.openModal) window.openModal(searchModal);
         }));
     }
+
+    // --- MEJORA: Delegación de eventos para botones "Agregar al carrito" ---
+    // Esto reemplaza los `onclick` en el HTML y soluciona el problema de IDs.
+    document.body.addEventListener('click', (e) => {
+        const addToCartButton = e.target.closest('button.add-to-cart');
+        if (addToCartButton) {
+            e.preventDefault(); // Prevenir cualquier comportamiento por defecto
+            const productId = addToCartButton.getAttribute('data-id');
+            if (productId) window.addToCart(productId);
+        }
+    });
 });

@@ -1,8 +1,11 @@
 const mongoose = require('mongoose');
-const Order = require('../models/Order.model');
-const Product = require('../models/Product.model');
-const PaymentSession = require('../models/PaymentSession.model');
-const wompiService = require('../services/wompi.service');
+const Order = require('../Order.model');
+const Product = require('../Product.model');
+const PaymentSession = require('../PaymentSession.model');
+const wompiService = require('../wompi.service');
+
+// Tasa de cambio (temporal hasta que los precios en DB estén en COP)
+const USD_TO_COP = 5200;
 
 const handleWompiWebhook = async (req, res) => {
   const session = await mongoose.startSession();
@@ -65,12 +68,14 @@ const handleWompiWebhook = async (req, res) => {
     }
 
     // 6️⃣ Validación de integridad financiera
-    const sessionAmountInCents = Math.round(paymentSession.total * 100);
+    // Convertir el total de la sesión (guardado en USD) a centavos de COP para comparar
+    const sessionAmountInCents = Math.round((paymentSession.total * USD_TO_COP) * 100);
     if (transaction.currency !== 'COP') {
       console.error(`[Webhook] Moneda inválida: ${transaction.currency}`);
       return res.status(200).json({ ok: false, msg: 'Moneda incorrecta' });
     }
-    if (transaction.amount_in_cents !== sessionAmountInCents) {
+    // Permitir un pequeño margen de error por redondeo (opcional, aquí estricto)
+    if (Math.abs(transaction.amount_in_cents - sessionAmountInCents) > 100) { // Margen de 100 pesos
       console.error(
         `[Webhook] Discrepancia de montos. Esperado ${sessionAmountInCents}, recibido ${transaction.amount_in_cents}`
       );

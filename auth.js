@@ -5,6 +5,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
         ? 'http://localhost:3000/api'
         : '/api';
+    // Tasa de cambio (temporal hasta que los precios en DB estén en COP)
+    const USD_TO_COP = 5200;
+
     const API_AUTH_URL = `${API_URL}/auth`;
     const API_ORDERS_URL = `${API_URL}/orders`;
     
@@ -179,9 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <td style="padding:12px;">
                                 ${new Date(order.createdAt || order.date).toLocaleDateString()}
                             </td>
-                            <td style="padding:12px; font-weight:bold;">
-                                $${parseFloat(order.total).toFixed(2)}
-                            </td>
+                            <td style="padding:12px; font-weight:bold;">${formatCOP(order.total * USD_TO_COP)}</td>
                             <td style="padding:12px;">
                                 <span style="
                                     background:#e6fffa;
@@ -220,9 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td style="padding:12px;">
                         ${new Date(order.createdAt || order.date).toLocaleDateString()}
                     </td>
-                    <td style="padding:12px; font-weight:bold;">
-                        $${parseFloat(order.total).toFixed(2)}
-                    </td>
+                    <td style="padding:12px; font-weight:bold;">${formatCOP(order.total * USD_TO_COP)}</td>
                     <td style="padding:12px;">
                         <span style="
                             background:#e6fffa;

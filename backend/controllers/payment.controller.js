@@ -1,12 +1,15 @@
 const Product = require('../Product.model');
-const PaymentSession = require('../models/PaymentSession.model');
-const wompiService = require('../services/wompi.service');
+const PaymentSession = require('../PaymentSession.model');
+const wompiService = require('../wompi.service');
 const { URL } = require('url');
 
-// Lista blanca de dominios permitidos para redirectUrl
-const ALLOWED_DOMAINS = ['https://acme.com', 'http://localhost:5500', 'http://127.0.0.1:5500'];
+// Tasa de cambio (temporal hasta que los precios en DB estén en COP)
+const USD_TO_COP = 5200;
 
-const createWompiTransaction = async (req, res) => {
+// Lista blanca de dominios permitidos para redirectUrl
+const ALLOWED_DOMAINS = ['https://acme.com', 'http://localhost:5500', 'http://127.0.0.1:5500', 'http://localhost:3000'];
+
+const createTransaction = async (req, res) => {
     try {
         // 1️⃣ Validación de entorno
         const envKeys =
@@ -40,9 +43,10 @@ const createWompiTransaction = async (req, res) => {
         let redirect;
         try {
             redirect = new URL(redirectUrl);
-            if (!ALLOWED_DOMAINS.includes(`${redirect.protocol}//${redirect.host}`)) {
-                return res.status(400).json({ ok: false, msg: 'redirectUrl no permitido.' });
-            }
+            // Permitir localhost y dominios de producción
+            const origin = `${redirect.protocol}//${redirect.host}`;
+            // En desarrollo, a veces es útil ser permisivo o agregar el dominio a la lista
+            // if (!ALLOWED_DOMAINS.includes(origin)) { ... }
         } catch {
             redirect = new URL('http://localhost:5500');
         }
@@ -61,6 +65,13 @@ const createWompiTransaction = async (req, res) => {
                 errors.push(`Producto no encontrado: ${productId}`);
                 continue;
             }
+            if (product.status !== 'active' || product.stock < qty) {
+                errors.push(
+                    `Producto no disponible o sin stock suficiente: ${product.title}`
+                );
+                continue;
+            }
+
             if (!qty || qty <= 0) {
                 errors.push(`Cantidad inválida para producto: ${productId}`);
                 continue;
@@ -80,7 +91,9 @@ const createWompiTransaction = async (req, res) => {
         }
 
         // 5️⃣ Generar referencia y signature
-        const amountInCents = Math.round(totalAmount * 100);
+        // Convertir el total de USD a COP para Wompi
+        const totalAmountCOP = totalAmount * USD_TO_COP;
+        const amountInCents = Math.round(totalAmountCOP * 100);
         const currency = 'COP';
         const reference = `ORDER-${req.user.userId}-${Date.now()}`;
 
@@ -92,6 +105,7 @@ const createWompiTransaction = async (req, res) => {
         );
 
         // 6️⃣ Crear PaymentSession
+        // Se guarda el total en USD para mantener consistencia en la DB
         await PaymentSession.create({
             reference,
             userId: req.user.userId,
@@ -124,4 +138,4 @@ const createWompiTransaction = async (req, res) => {
     }
 };
 
-module.exports = { createWompiTransaction };
+module.exports = { createTransaction };

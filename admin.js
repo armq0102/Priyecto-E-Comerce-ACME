@@ -3,11 +3,24 @@ const API_URL = window.location.hostname === 'localhost' || window.location.host
     ? 'http://localhost:3000/api'
     : '/api';
 
+// Tasa de cambio (temporal hasta que los precios en DB estén en COP)
+const USD_TO_COP = 5200;
+
 // --- STATE ---
 let currentProductToEdit = null;
 let currentAdminId = null;
 let currentOrderToEdit = null;
 let currentSection = localStorage.getItem('acme_admin_section') || 'inventory';
+
+// --- HELPERS ---
+function formatCOP(value) {
+    return new Intl.NumberFormat('es-CO', {
+        style: 'currency',
+        currency: 'COP',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(value);
+}
 
 // --- AUTHENTICATION ---
 
@@ -184,7 +197,7 @@ const AdminUI = {
                         <div style="font-weight:600">${p.title}</div>
                         <small style="color:#888">ID: ${productId}</small>
                     </td>
-                    <td>$${p.price.toFixed(2)}</td>
+                    <td>${formatCOP(p.price * USD_TO_COP)}</td>
                     <td><span class="badge ${p.stock > 5 ? 'badge-success' : 'badge-danger'}">${p.stock} unid.</span></td>
                     <td><span class="badge badge-${p.status === 'active' ? 'success' : (p.status === 'hidden' ? 'warning' : 'danger')}">${p.status || 'active'}</span></td>
                     <td>
@@ -241,7 +254,8 @@ const AdminUI = {
                     <td><small>#${orderId.toString().substring(orderId.length - 7)}</small></td>
                     <td>${userName}</td>
                     <td>${productsSummary}</td>
-                    <td>$${o.total.toFixed(2)}</td>
+                    {/* El total del pedido también se guarda en USD, por lo que necesita conversión */}
+                    <td>${formatCOP(o.total * USD_TO_COP)}</td>
                     <td>${new Date(o.createdAt).toLocaleDateString()}</td>
                     <td><span class="badge ${badgeClass}">${o.status}</span></td>
                     <td><button class="btn btn-sm btn-outline" onclick="openStatusModal('${orderId}', '${o.status}')">🔄 Estado</button></td>
@@ -334,7 +348,8 @@ function openProductModal(product) {
         currentProductToEdit = product._id || product.id;
         modalTitle.textContent = 'Editar Producto';
         document.getElementById('prodName').value = product.title;
-        document.getElementById('prodPrice').value = product.price;
+        // Convertir el precio de USD (DB) a COP para mostrarlo en el formulario
+        document.getElementById('prodPrice').value = product.price * USD_TO_COP;
         document.getElementById('prodStock').value = product.stock;
         document.getElementById('prodImage').value = product.img;
         document.getElementById('prodStatus').value = product.status || 'active';
@@ -353,7 +368,8 @@ document.getElementById('saveProductBtn').addEventListener('click', async (e) =>
     
     const payload = {
         name: document.getElementById('prodName').value,
-        price: parseFloat(document.getElementById('prodPrice').value),
+        // Convertir el precio de COP (formulario) a USD para guardarlo en la DB
+        price: parseFloat(document.getElementById('prodPrice').value) / USD_TO_COP,
         stock: parseInt(document.getElementById('prodStock').value),
         imageUrl: document.getElementById('prodImage').value,
         status: document.getElementById('prodStatus').value
