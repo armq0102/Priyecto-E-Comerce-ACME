@@ -39,7 +39,7 @@ app.use(express.json({ limit: '1mb' }));
 // Rate Limiting para Auth (Protección contra fuerza bruta)
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 100, // Aumentado a 100 para evitar bloqueos durante pruebas
+  max: 1000, // Aumentado a 1000 para evitar bloqueos durante pruebas intensivas
   message: 'Demasiados intentos de inicio de sesión, por favor intente nuevamente en 15 minutos.'
 });
 app.use('/api/auth/', authLimiter);
