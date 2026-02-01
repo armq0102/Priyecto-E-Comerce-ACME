@@ -1,7 +1,5 @@
 // --- CONFIGURATION ---
-const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? 'http://localhost:3000/api'
-    : '/api';
+const API_URL = 'https://priyecto-e-comerce-acme.onrender.com/api';
 
 // --- STATE ---
 let currentProductToEdit = null;
