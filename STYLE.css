@@ -120,6 +120,29 @@ body {
   outline-offset: 2px;
 }
 
+/* --- RESPONSIVE HEADER (Móvil) --- */
+@media (max-width: 850px) {
+    .header-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+
+    .main-nav ul {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px; /* Espacio entre enlaces */
+    }
+
+    .main-nav li {
+        margin-left: 0; /* Reset del margen izquierdo */
+    }
+
+    .header-icons {
+        justify-content: center;
+    }
+}
+
 .user-dropdown {
     position: absolute;
     right: 0;
