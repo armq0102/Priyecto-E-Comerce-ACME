@@ -517,8 +517,8 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Cerrar carrito si está abierto
             const cartDrawer = document.getElementById('cartDrawer');
-            if (cartDrawer && !cartDrawer.classList.contains('hidden')) {
-                window.closeModal(cartDrawer);
+            if (cartDrawer && cartDrawer.classList.contains('open')) {
+                window.closeCartDrawer();
             }
         }
     });

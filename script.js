@@ -447,15 +447,15 @@ document.addEventListener('DOMContentLoaded', () => {
     openCartBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
-            openCartDrawer();
+            window.openCartDrawer();
         });
     });
 
     const closeCartBtn = document.getElementById('cartDrawerClose');
-    if (closeCartBtn) closeCartBtn.addEventListener('click', closeCartDrawer);
+    if (closeCartBtn) closeCartBtn.addEventListener('click', window.closeCartDrawer);
 
     const backdrop = document.getElementById('cartDrawerBackdrop');
-    if (backdrop) backdrop.addEventListener('click', closeCartDrawer);
+    if (backdrop) backdrop.addEventListener('click', window.closeCartDrawer);
 
     // 3. Botones de Checkout
     const drawerCheckout = document.getElementById('drawerCheckout');
