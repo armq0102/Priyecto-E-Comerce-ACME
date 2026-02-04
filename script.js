@@ -61,11 +61,23 @@ function renderFeaturedProducts() {
         featuredContainer.innerHTML = featured.map(p => {
             const isOutOfStock = (p.stock !== undefined && p.stock <= 0) || p.status === 'out_of_stock';
             const isLowStock = !isOutOfStock && p.stock !== undefined && p.stock > 0 && p.stock < 10;
+            
+            // Tag de categoría
+            const categoryTag = p.category || 'Otros';
+            const categoryColor = {
+                'Mujeres': '#FF69B4',
+                'Hombres': '#4169E1',
+                'Accesorios': '#FFB347',
+                'Sostenibilidad': '#32CD32'
+            }[categoryTag] || '#999';
 
             return `
             <article class="product-card ${isOutOfStock ? 'out-of-stock' : ''}">
-                ${isOutOfStock ? '<span class="badge-out-of-stock">Agotado</span>' : ''}
-                <img src="${p.img}" alt="${p.title}">
+                <div style="position: relative;">
+                    ${isOutOfStock ? '<span class="badge-out-of-stock">Agotado</span>' : ''}
+                    <span class="category-tag" style="position: absolute; top: 10px; right: 10px; background: ${categoryColor}; color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.75em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; z-index: 10; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">${categoryTag}</span>
+                    <img src="${p.img}" alt="${p.title}">
+                </div>
                 <h3>${p.title}</h3>
                 <p class="price">${formatCOP(p.price)}</p>
                 ${isLowStock ? `<p style="color:var(--acme-red, #cc0000);font-weight:bold;font-size:0.85rem;margin-bottom:5px;">¡Solo quedan ${p.stock}!</p>` : ''}
@@ -109,6 +121,27 @@ function updateCategoryPagesUI() {
         if (product && product.stock !== undefined) {
             const card = btn.closest('.product-card');
 
+            // --- MEJORA: Agregar tag de categoría si no existe ---
+            if (!card.querySelector('.category-tag')) {
+                const categoryTag = product.category || 'Otros';
+                const categoryColor = {
+                    'Mujeres': '#FF69B4',
+                    'Hombres': '#4169E1',
+                    'Accesorios': '#FFB347',
+                    'Sostenibilidad': '#32CD32'
+                }[categoryTag] || '#999';
+                
+                const img = card.querySelector('img');
+                if (img) {
+                    const tagEl = document.createElement('span');
+                    tagEl.className = 'category-tag';
+                    tagEl.style.cssText = `position: absolute; top: 10px; right: 10px; background: ${categoryColor}; color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.75em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; z-index: 10; box-shadow: 0 2px 8px rgba(0,0,0,0.2);`;
+                    tagEl.textContent = categoryTag;
+                    img.parentNode.insertBefore(tagEl, img);
+                }
+            }
+            // ---------------------------------------------------
+            
             // --- MEJORA: Actualizar el precio dinámicamente ---
             const priceEl = card.querySelector('p.price');
             if (priceEl) {

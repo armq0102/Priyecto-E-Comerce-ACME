@@ -196,39 +196,42 @@
     <!-- Modales de Login / Registro -->
     <div id="loginModal" class="modal hidden" aria-hidden="true">
         <div class="modal-backdrop"></div>
-        <div class="modal-content login-content">
+        <div class="modal-content login-content" style="animation: slideInLeft 0.4s ease; max-width: 420px;">
             <button class="modal-close" aria-label="Cerrar">&times;</button>
-            <h2>Bienvenido</h2>
-            <p class="modal-subtitle">Ingresa a tu cuenta para continuar</p>
+            <div style="text-align: center; margin-bottom: 25px;">
+                <div style="font-size: 2.5em; margin-bottom: 10px;">🔐</div>
+                <h2 style="margin: 0 0 8px 0; font-size: 1.8em;">Bienvenido</h2>
+                <p class="modal-subtitle" style="margin: 0; color: #666;">Ingresa a tu cuenta para continuar</p>
+            </div>
             
             <div class="login-methods">
-                <button class="btn btn-facebook">Continuar con Facebook</button>
+                <button class="btn btn-facebook" style="background: #1877F2; border: none; color: white; font-weight: 600; transition: all 0.3s ease;" onmouseover="this.style.background='#0a66c2'" onmouseout="this.style.background='#1877F2'">👥 Continuar con Facebook</button>
             </div>
 
-            <div class="divider"><span>O inicia con correo</span></div>
+            <div class="divider" style="margin: 20px 0;"><span style="background: white; padding: 0 10px; color: #999;">O inicia con correo</span></div>
 
-            <form id="loginForm">
-                <div class="input-group">
-                    <label>Correo Electrónico</label>
-                    <input type="email" name="email" placeholder="nombre@ejemplo.com" required>
+            <form id="loginForm" style="background: #f9f9f9; padding: 20px; border-radius: 12px; border: 1px solid #e0e0e0;">
+                <div class="input-group" style="margin-bottom: 18px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #333; font-size: 0.95em;">📧 Correo Electrónico</label>
+                    <input type="email" name="email" placeholder="nombre@ejemplo.com" required style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1em; transition: all 0.3s ease; box-sizing: border-box;" onfocus="this.style.borderColor='#cc0000'; this.style.boxShadow='0 0 0 3px rgba(204,0,0,0.1)'" onblur="this.style.borderColor='#e0e0e0'; this.style.boxShadow='none'">
                 </div>
-                <div id="passwordGroup" class="input-group">
-                    <label>Contraseña</label>
+                <div id="passwordGroup" class="input-group" style="margin-bottom: 18px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #333; font-size: 0.95em;">🔑 Contraseña</label>
                     <div style="position:relative">
-                        <input type="password" name="password" id="loginPasswordIndex" placeholder="••••••" required style="padding-right: 35px;">
-                        <button type="button" class="toggle-password" data-target="loginPasswordIndex" style="position:absolute; right:5px; top:50%; transform:translateY(-50%); border:none; background:transparent; cursor:pointer;" aria-label="Mostrar contraseña">👁️</button>
+                        <input type="password" name="password" id="loginPasswordIndex" placeholder="••••••" required style="width: 100%; padding: 12px; padding-right: 45px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1em; transition: all 0.3s ease; box-sizing: border-box;" onfocus="this.style.borderColor='#cc0000'; this.style.boxShadow='0 0 0 3px rgba(204,0,0,0.1)'" onblur="this.style.borderColor='#e0e0e0'; this.style.boxShadow='none'">
+                        <button type="button" class="toggle-password" data-target="loginPasswordIndex" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); border:none; background:transparent; cursor:pointer; font-size: 1.2em;" aria-label="Mostrar contraseña">👁️</button>
                     </div>
                 </div>
-                <div id="codeGroup" class="input-group hidden">
-                    <label>Código de acceso</label>
-                    <div class="code-input-row">
-                        <input type="text" name="code" placeholder="Código de 6 dígitos">
-                        <button type="button" class="btn btn-outline" id="sendCodeBtn">Enviar código</button>
+                <div id="codeGroup" class="input-group hidden" style="margin-bottom: 18px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #333; font-size: 0.95em;">📱 Código de acceso</label>
+                    <div class="code-input-row" style="display: flex; gap: 10px;">
+                        <input type="text" name="code" placeholder="Código de 6 dígitos" style="flex: 1; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1em; transition: all 0.3s ease; box-sizing: border-box;" onfocus="this.style.borderColor='#cc0000'" onblur="this.style.borderColor='#e0e0e0'">
+                        <button type="button" class="btn btn-outline" id="sendCodeBtn" style="padding: 12px 20px; white-space: nowrap;">Enviar</button>
                     </div>
                 </div>
-                <div class="form-actions vertical">
-                    <button type="submit" class="btn btn-dark full-width">Iniciar Sesión</button>
-                    <button type="button" id="toggleLoginMethod" class="btn-link">Usar código de acceso</button>
+                <div class="form-actions vertical" style="margin-top: 25px;">
+                    <button type="submit" class="btn btn-dark full-width" style="padding: 14px; font-weight: 600; font-size: 1.05em; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.2)'" onmouseout="this.style.transform='none'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'">Iniciar Sesión</button>
+                    <button type="button" id="toggleLoginMethod" class="btn-link" style="margin-top: 15px; color: #cc0000; text-decoration: none; border: none; background: none; cursor: pointer; font-size: 0.95em; transition: all 0.2s ease;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">Usar código de acceso</button>
                 </div>
             </form>
             <div id="loginStatus"></div>
