@@ -108,7 +108,7 @@ Plataforma de comercio electronico completa construida con Node.js, Express y Mo
 
 1) Clonar repositorio
 ```bash
-git clone https://github.com/tu-usuario/acme-ecommerce.git
+git clone https://github.com/armq0102/Proyecto-E-Commerce-ACME.git
 cd acme-ecommerce
 ```
 
