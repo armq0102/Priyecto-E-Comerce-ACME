@@ -285,6 +285,7 @@ router.get('/migrate-cloudinary', async (req, res) => {
             'Camiseta Para Niña Cuello Redondo Screen.jpg': 'https://res.cloudinary.com/dbeu6q8qp/image/upload/v1770331092/acme/products/Camiseta%20Para%20Ni%C3%B1a%20Cuello%20Redondo%20Screen.jpg'
         };
 
+        const forceUpdate = req.query.force === 'true';
         const products = await Product.find({});
         let updated = 0;
         let skipped = 0;
@@ -293,15 +294,29 @@ router.get('/migrate-cloudinary', async (req, res) => {
         for (const product of products) {
             const img = product.img || '';
 
-            // Si ya es URL de Cloudinary, saltar
-            if (/cloudinary\.com/i.test(img)) {
+            // Si ya tiene URL correcta de Cloudinary y no forzamos, saltar
+            if (!forceUpdate && /cloudinary\.com.*\/v\d+\/acme\/products\//i.test(img)) {
                 skipped++;
                 continue;
             }
 
-            // Extraer nombre del archivo
-            const filename = path.basename(img);
-            const cloudUrl = imageMap[filename];
+            // Extraer nombre del archivo de cualquier URL
+            let filename = path.basename(img);
+            
+            // Limpiar nombres de archivo con timestamps o caracteres raros
+            filename = filename.replace(/^\d+_/, '').replace(/[_-]/g, ' ').replace(/\.webp1$/i, '.webp');
+            
+            // Buscar coincidencia en el mapa (case-insensitive y flexible)
+            let cloudUrl = null;
+            for (const [key, value] of Object.entries(imageMap)) {
+                const keyNormalized = key.toLowerCase().replace(/[_-]/g, ' ');
+                const filenameNormalized = filename.toLowerCase().replace(/[_-]/g, ' ');
+                
+                if (keyNormalized === filenameNormalized || key === filename) {
+                    cloudUrl = value;
+                    break;
+                }
+            }
 
             if (cloudUrl) {
                 try {
@@ -313,7 +328,7 @@ router.get('/migrate-cloudinary', async (req, res) => {
                 }
             } else {
                 skipped++;
-                errors.push({ product: product.title, filename, error: 'No se encontró en el mapa de imágenes' });
+                errors.push({ product: product.title, filename, error: 'No se encontró coincidencia en el mapa' });
             }
         }
 
