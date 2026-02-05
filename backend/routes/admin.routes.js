@@ -264,59 +264,30 @@ router.get('/migrate-cloudinary', async (req, res) => {
             return res.status(500).json({ ok: false, msg: 'Cloudinary no está configurado en el servidor' });
         }
 
-        // Mapa manual de imágenes conocidas (basado en el upload realizado)
-        const imageMap = {
-            '1.png': 'https://res.cloudinary.com/dbeu6q8qp/image/upload/v1770331082/acme/products/1.png',
-            '2.png': 'https://res.cloudinary.com/dbeu6q8qp/image/upload/v1770331083/acme/products/2.png',
-            '3.png': 'https://res.cloudinary.com/dbeu6q8qp/image/upload/v1770331083/acme/products/3.png',
-            '4.png': 'https://res.cloudinary.com/dbeu6q8qp/image/upload/v1770331084/acme/products/4.png',
-            '5.png': 'https://res.cloudinary.com/dbeu6q8qp/image/upload/v1770331084/acme/products/5.png',
-            'Blusa camisera para mujer manga larga.webp': 'https://res.cloudinary.com/dbeu6q8qp/image/upload/v1770331085/acme/products/Blusa%20camisera%20para%20mujer%20manga%20larga.webp',
-            'Camisa azul clásica para niño.webp': 'https://res.cloudinary.com/dbeu6q8qp/image/upload/v1770331086/acme/products/Camisa%20azul%20cl%C3%A1sica%20para%20ni%C3%B1o.webp',
-            'camisa clasica blanca.webp': 'https://res.cloudinary.com/dbeu6q8qp/image/upload/v1770331086/acme/products/camisa%20clasica%20blanca.webp',
-            'Camisa clásica para hombre Morado.webp': 'https://res.cloudinary.com/dbeu6q8qp/image/upload/v1770331087/acme/products/Camisa%20cl%C3%A1sica%20para%20hombre%20Morado.webp',
-            'Camisa Manga Larga Para Mujer Iconic Western.webp': 'https://res.cloudinary.com/dbeu6q8qp/image/upload/v1770331087/acme/products/Camisa%20Manga%20Larga%20Para%20Mujer%20Iconic%20Western.webp',
-            'Camisa Oxford Hombre Azul oscura.webp': 'https://res.cloudinary.com/dbeu6q8qp/image/upload/v1770331088/acme/products/Camisa%20Oxford%20Hombre%20Azul%20oscura.webp',
-            'Camisas de Moda para Mujer.webp': 'https://res.cloudinary.com/dbeu6q8qp/image/upload/v1770331089/acme/products/Camisas%20de%20Moda%20para%20Mujer.webp',
-            'Camisas Manga Larga para hombre.webp': 'https://res.cloudinary.com/dbeu6q8qp/image/upload/v1770331090/acme/products/Camisas%20Manga%20Larga%20para%20hombre.webp',
-            'Camisas para Mujer Armatura.webp': 'https://res.cloudinary.com/dbeu6q8qp/image/upload/v1770331090/acme/products/Camisas%20para%20Mujer%20Armatura.webp',
-            'Camiseta deportiva de futbol para niño unisex.webp': 'https://res.cloudinary.com/dbeu6q8qp/image/upload/v1770331091/acme/products/Camiseta%20deportiva%20de%20futbol%20para%20ni%C3%B1o%20unisex.webp',
-            'Camiseta Lilo y Stitch.jpg': 'https://res.cloudinary.com/dbeu6q8qp/image/upload/v1770331091/acme/products/Camiseta%20Lilo%20y%20Stitch.jpg',
-            'Camiseta Para Niña Cuello Redondo Screen.jpg': 'https://res.cloudinary.com/dbeu6q8qp/image/upload/v1770331092/acme/products/Camiseta%20Para%20Ni%C3%B1a%20Cuello%20Redondo%20Screen.jpg'
+        // Mapeo por título de producto (más confiable)
+        const titleMap = {
+            'Camisa clásica Blanca': 'https://res.cloudinary.com/dbeu6q8qp/image/upload/v1770331086/acme/products/camisa%20clasica%20blanca.webp',
+            'Camisas Manga Larga para hombre': 'https://res.cloudinary.com/dbeu6q8qp/image/upload/v1770331090/acme/products/Camisas%20Manga%20Larga%20para%20hombre.webp',
+            'Camisa clásica Morada': 'https://res.cloudinary.com/dbeu6q8qp/image/upload/v1770331087/acme/products/Camisa%20cl%C3%A1sica%20para%20hombre%20Morado.webp',
+            'Camisa Oxford Hombre Azul oscura': 'https://res.cloudinary.com/dbeu6q8qp/image/upload/v1770331088/acme/products/Camisa%20Oxford%20Hombre%20Azul%20oscura.webp',
+            'Camisas de Moda para Mujer': 'https://res.cloudinary.com/dbeu6q8qp/image/upload/v1770331089/acme/products/Camisas%20de%20Moda%20para%20Mujer.webp',
+            'Blusa camisera para mujer manga larga': 'https://res.cloudinary.com/dbeu6q8qp/image/upload/v1770331085/acme/products/Blusa%20camisera%20para%20mujer%20manga%20larga.webp',
+            'Camisa Manga Larga Para Mujer Iconic Western': 'https://res.cloudinary.com/dbeu6q8qp/image/upload/v1770331087/acme/products/Camisa%20Manga%20Larga%20Para%20Mujer%20Iconic%20Western.webp',
+            'Camisas para Mujer Armatura': 'https://res.cloudinary.com/dbeu6q8qp/image/upload/v1770331090/acme/products/Camisas%20para%20Mujer%20Armatura.webp',
+            'Camisa azul clásica para niño': 'https://res.cloudinary.com/dbeu6q8qp/image/upload/v1770331086/acme/products/Camisa%20azul%20cl%C3%A1sica%20para%20ni%C3%B1o.webp',
+            'Camiseta Lilo y Stitch': 'https://res.cloudinary.com/dbeu6q8qp/image/upload/v1770331091/acme/products/Camiseta%20Lilo%20y%20Stitch.jpg',
+            'Camiseta deportiva de futbol para niño unisex': 'https://res.cloudinary.com/dbeu6q8qp/image/upload/v1770331091/acme/products/Camiseta%20deportiva%20de%20futbol%20para%20ni%C3%B1o%20unisex.webp',
+            'Camiseta Para Niña Cuello Redondo Screen': 'https://res.cloudinary.com/dbeu6q8qp/image/upload/v1770331092/acme/products/Camiseta%20Para%20Ni%C3%B1a%20Cuello%20Redondo%20Screen.jpg'
         };
 
-        const forceUpdate = req.query.force === 'true';
         const products = await Product.find({});
         let updated = 0;
         let skipped = 0;
         let errors = [];
 
         for (const product of products) {
-            const img = product.img || '';
-
-            // Si ya tiene URL correcta de Cloudinary y no forzamos, saltar
-            if (!forceUpdate && /cloudinary\.com.*\/v\d+\/acme\/products\//i.test(img)) {
-                skipped++;
-                continue;
-            }
-
-            // Extraer nombre del archivo de cualquier URL
-            let filename = path.basename(img);
-            
-            // Limpiar nombres de archivo con timestamps o caracteres raros
-            filename = filename.replace(/^\d+_/, '').replace(/[_-]/g, ' ').replace(/\.webp1$/i, '.webp');
-            
-            // Buscar coincidencia en el mapa (case-insensitive y flexible)
-            let cloudUrl = null;
-            for (const [key, value] of Object.entries(imageMap)) {
-                const keyNormalized = key.toLowerCase().replace(/[_-]/g, ' ');
-                const filenameNormalized = filename.toLowerCase().replace(/[_-]/g, ' ');
-                
-                if (keyNormalized === filenameNormalized || key === filename) {
-                    cloudUrl = value;
-                    break;
-                }
-            }
+            // Buscar URL directamente por nombre del producto
+            const cloudUrl = titleMap[product.name];
 
             if (cloudUrl) {
                 try {
@@ -324,11 +295,11 @@ router.get('/migrate-cloudinary', async (req, res) => {
                     await product.save();
                     updated++;
                 } catch (error) {
-                    errors.push({ product: product.title, filename, error: error.message });
+                    errors.push({ product: product.name, error: error.message });
                 }
             } else {
                 skipped++;
-                errors.push({ product: product.title, filename, error: 'No se encontró coincidencia en el mapa' });
+                errors.push({ product: product.name, error: 'No se encontró en el mapa de títulos' });
             }
         }
 
