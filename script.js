@@ -96,60 +96,72 @@ function renderFeaturedProducts() {
             }
         });
         
+        // Si faltan categorías, llenar con productos aleatorios disponibles
+        while (featured.length < 4 && PRODUCTS.length > featured.length) {
+            const allProducts = PRODUCTS.filter(p => p.status !== 'hidden' && !featured.includes(p));
+            if (allProducts.length > 0) {
+                const randomProduct = allProducts[Math.floor(Math.random() * allProducts.length)];
+                featured.push(randomProduct);
+            } else {
+                break;
+            }
+        }
+        
         // Agregar transición fade
         featuredContainer.style.opacity = '0';
         featuredContainer.style.transition = 'opacity 0.6s ease-in-out';
         
         setTimeout(() => {
             featuredContainer.innerHTML = featured.map(p => {
-            const productId = p.id || p._id;
-            const isOutOfStock = (p.stock !== undefined && p.stock <= 0) || p.status === 'out_of_stock';
-            const isLowStock = !isOutOfStock && p.stock !== undefined && p.stock > 0 && p.stock < 10;
-            const brand = (p.brand || 'ACME').toUpperCase();
-            const discount = getDiscountInfo(p);
-            const discountClass = discount.percent ? '' : 'is-hidden';
-            const categoryDisplay = (p.category || 'Otros').toLowerCase() === 'accesorios' ? 'Niños' : (p.category || 'Otros');
-            
-            // Tag de categoría
-            const categoryTag = categoryDisplay;
-            const categoryColor = {
-                'Mujeres': '#FF69B4',
-                'Hombres': '#4169E1',
-                'Niños': '#FFB347',
-                'Sostenibilidad': '#32CD32'
-            }[categoryTag] || '#999';
+                const productId = p.id || p._id;
+                const isOutOfStock = (p.stock !== undefined && p.stock <= 0) || p.status === 'out_of_stock';
+                const isLowStock = !isOutOfStock && p.stock !== undefined && p.stock > 0 && p.stock < 10;
+                const brand = (p.brand || 'ACME').toUpperCase();
+                const discount = getDiscountInfo(p);
+                const discountClass = discount.percent ? '' : 'is-hidden';
+                const categoryDisplay = (p.category || 'Otros').toLowerCase() === 'accesorios' ? 'Niños' : (p.category || 'Otros');
+                
+                // Tag de categoría
+                const categoryTag = categoryDisplay;
+                const categoryColor = {
+                    'Mujeres': '#FF69B4',
+                    'Hombres': '#4169E1',
+                    'Niños': '#FFB347',
+                    'Sostenibilidad': '#32CD32'
+                }[categoryTag] || '#999';
 
-            return `
-            <article class="product-card ${isOutOfStock ? 'out-of-stock' : ''}">
-                <div class="product-media">
-                    ${isOutOfStock ? '<span class="badge-out-of-stock">Agotado</span>' : ''}
-                    <span class="discount-badge ${discountClass}">${discount.percent ? `-${discount.percent}%` : ''}</span>
-                    <span class="category-tag" style="position: absolute; top: 10px; right: 10px; background: ${categoryColor}; color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.75em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; z-index: 10; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">${categoryTag}</span>
-                    <button class="media-arrow media-arrow--left" type="button" aria-label="Imagen anterior">&#x2039;</button>
-                    <button class="media-arrow media-arrow--right" type="button" aria-label="Siguiente imagen">&#x203A;</button>
-                    <img src="${resolveImageUrl(p.img)}" alt="${p.title}">
-                    <div class="media-dots" aria-hidden="true">
-                        <span class="media-dot active"></span>
-                        <span class="media-dot"></span>
-                        <span class="media-dot"></span>
+                return `
+                <article class="product-card ${isOutOfStock ? 'out-of-stock' : ''}">
+                    <div class="product-media">
+                        ${isOutOfStock ? '<span class="badge-out-of-stock">Agotado</span>' : ''}
+                        <span class="discount-badge ${discountClass}">${discount.percent ? `-${discount.percent}%` : ''}</span>
+                        <span class="category-tag" style="position: absolute; top: 10px; right: 10px; background: ${categoryColor}; color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.75em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; z-index: 10; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">${categoryTag}</span>
+                        <button class="media-arrow media-arrow--left" type="button" aria-label="Imagen anterior">&#x2039;</button>
+                        <button class="media-arrow media-arrow--right" type="button" aria-label="Siguiente imagen">&#x203A;</button>
+                        <img src="${resolveImageUrl(p.img)}" alt="${p.title}">
+                        <div class="media-dots" aria-hidden="true">
+                            <span class="media-dot active"></span>
+                            <span class="media-dot"></span>
+                            <span class="media-dot"></span>
+                        </div>
                     </div>
-                </div>
-                <div class="product-info">
-                    <h3 class="product-title">${p.title}</h3>
-                    <div class="product-brand">${brand}</div>
-                    <div class="price-row">
-                        <span class="price-current">${formatCOP(p.price)}</span>
-                        ${discount.oldPrice ? `<span class="price-old">${formatCOP(discount.oldPrice)}</span>` : ''}
+                    <div class="product-info">
+                        <h3 class="product-title">${p.title}</h3>
+                        <div class="product-brand">${brand}</div>
+                        <div class="price-row">
+                            <span class="price-current">${formatCOP(p.price)}</span>
+                            ${discount.oldPrice ? `<span class="price-old">${formatCOP(discount.oldPrice)}</span>` : ''}
+                        </div>
+                        ${isLowStock ? `<p class="stock-warning" style="color:var(--acme-red, #cc0000);font-weight:bold;font-size:0.85rem;margin:6px 0 0;">¡Solo quedan ${p.stock}!</p>` : ''}
+                        <button class="btn btn-dark add-to-cart"
+                                data-id="${productId}"
+                                ${isOutOfStock ? 'disabled' : ''}>
+                            ${isOutOfStock ? 'Agotado' : 'Agregar al carrito'}
+                        </button>
                     </div>
-                    ${isLowStock ? `<p class="stock-warning" style="color:var(--acme-red, #cc0000);font-weight:bold;font-size:0.85rem;margin:6px 0 0;">¡Solo quedan ${p.stock}!</p>` : ''}
-                    <button class="btn btn-dark add-to-cart"
-                            data-id="${productId}"
-                            ${isOutOfStock ? 'disabled' : ''}>
-                        ${isOutOfStock ? 'Agotado' : 'Agregar al carrito'}
-                    </button>
-                </div>
-            setTimeout(() => renderFeaturedProducts(), 10000);
-        `}).join('');
+                </article>
+                `;
+            }).join('');
             
             // Fade in después de actualizar
             setTimeout(() => {
@@ -157,10 +169,8 @@ function renderFeaturedProducts() {
             }, 50);
         }, 300);
         
-        // Rotar productos cada 8 segundos si estamos en la página de inicio
-        if (featuredContainer && document.body.classList.contains('page-index')) {
-            setTimeout(() => renderFeaturedProducts(), 8000);
-        }
+        // Rotar productos cada 10 segundos
+        setTimeout(() => renderFeaturedProducts(), 10000);
     }
 }
 
