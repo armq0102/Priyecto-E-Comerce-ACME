@@ -230,7 +230,8 @@ function updateCategoryPagesUI() {
 }
 
 function getCategoryFromPath() {
-    const file = (window.location.pathname.split('/').pop() || '').toLowerCase();
+    const rawFile = window.location.pathname.split('/').pop() || '';
+    const file = decodeURIComponent(rawFile).toLowerCase();
     if (file.includes('hombres')) return 'Hombres';
     if (file.includes('mujeres')) return 'Mujeres';
     if (file.includes('niños') || file.includes('ninos')) return 'Niños';
