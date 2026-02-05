@@ -205,6 +205,7 @@ const AdminUI = {
                     <td><span class="badge badge-${p.status === 'active' ? 'success' : (p.status === 'hidden' ? 'warning' : 'danger')}">${p.status || 'active'}</span></td>
                     <td>
                         <button class="btn btn-sm btn-outline" onclick='openProductModal(${JSON.stringify(p)})'>✏️ Editar</button>
+                        <button class="btn btn-sm btn-danger" onclick='deleteProduct("${productId}")' style="margin-left:8px;">🗑️ Eliminar</button>
                     </td>
                 </tr>`;
             }).join('');
@@ -470,6 +471,23 @@ async function saveProduct(imageUrl) {
         showToast(currentProductToEdit ? 'Producto actualizado' : 'Producto creado', 'success');
     } else {
         showToast('Error al guardar producto', 'error');
+    }
+    setLoading(false);
+}
+
+async function deleteProduct(productId) {
+    if (!confirm('¿Estás seguro de eliminar este producto? Esta acción no se puede deshacer.')) {
+        return;
+    }
+
+    setLoading(true);
+    const response = await fetchAdmin(`/products/${productId}`, { method: 'DELETE' });
+    
+    if (response && response.ok) {
+        AdminUI.inventory.load();
+        showToast('Producto eliminado correctamente', 'success');
+    } else {
+        showToast('Error al eliminar producto', 'error');
     }
     setLoading(false);
 }

@@ -128,6 +128,23 @@ router.put('/products/:id', async (req, res) => {
     }
 });
 
+// DELETE /api/admin/products/:id (Eliminar)
+router.delete('/products/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const product = await Product.findByIdAndDelete(id);
+
+        if (!product) {
+            return res.status(404).json({ ok: false, msg: 'Producto no encontrado' });
+        }
+
+        res.json({ ok: true, msg: 'Producto eliminado correctamente' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ ok: false, msg: 'Error eliminando producto' });
+    }
+});
+
 // ==========================================
 // OTRAS RUTAS ADMIN (Soporte para admin.js)
 // ==========================================

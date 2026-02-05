@@ -20,6 +20,8 @@ body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-light);
 .btn:hover { opacity: 0.9; }
 .btn-primary { background-color: var(--primary); color: white; }
 .btn-secondary { background-color: var(--secondary); color: white; }
+.btn-danger { background-color: var(--danger); color: white; }
+.btn-danger:hover { background-color: #d85840; }
 .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-dark); }
 .btn-sm { padding: 4px 8px; font-size: 0.85rem; }
 
