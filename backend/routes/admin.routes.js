@@ -286,8 +286,8 @@ router.get('/migrate-cloudinary', async (req, res) => {
         let errors = [];
 
         for (const product of products) {
-            // Buscar URL directamente por nombre del producto
-            const cloudUrl = titleMap[product.name];
+            // Buscar URL directamente por título del producto
+            const cloudUrl = titleMap[product.title];
 
             if (cloudUrl) {
                 try {
@@ -295,11 +295,11 @@ router.get('/migrate-cloudinary', async (req, res) => {
                     await product.save();
                     updated++;
                 } catch (error) {
-                    errors.push({ product: product.name, error: error.message });
+                    errors.push({ product: product.title, error: error.message });
                 }
             } else {
                 skipped++;
-                errors.push({ product: product.name, error: 'No se encontró en el mapa de títulos' });
+                errors.push({ product: product.title, error: 'No se encontró en el mapa de títulos' });
             }
         }
 
