@@ -76,8 +76,24 @@ async function syncProducts() {
 function renderFeaturedProducts() {
     const featuredContainer = document.getElementById('featuredProducts');
     if (featuredContainer) {
-        // Filtramos los ocultos antes de mostrar
-        const featured = PRODUCTS.filter(p => p.status !== 'hidden').slice(0, 6);
+        // Seleccionar 1 producto aleatorio de cada categoría
+        const categories = ['Hombres', 'Mujeres', 'Niños', 'Sostenibilidad'];
+        const featured = [];
+        
+        categories.forEach(category => {
+            const categoryProducts = PRODUCTS.filter(p => {
+                const cat = (p.category || 'Otros').toLowerCase();
+                const normalizedCategory = (cat === 'accesorios' || cat === 'ninos' || cat === 'niños') ? 'niños' : cat;
+                const normalizedTarget = category.toLowerCase();
+                return normalizedCategory === normalizedTarget && p.status !== 'hidden';
+            });
+            
+            if (categoryProducts.length > 0) {
+                const randomProduct = categoryProducts[Math.floor(Math.random() * categoryProducts.length)];
+                featured.push(randomProduct);
+            }
+        });
+        
         featuredContainer.innerHTML = featured.map(p => {
             const productId = p.id || p._id;
             const isOutOfStock = (p.stock !== undefined && p.stock <= 0) || p.status === 'out_of_stock';
@@ -127,6 +143,11 @@ function renderFeaturedProducts() {
                 </div>
             </article>
         `}).join('');
+        
+        // Rotar productos cada 8 segundos si estamos en la página de inicio
+        if (featuredContainer && document.body.classList.contains('page-index')) {
+            setTimeout(() => renderFeaturedProducts(), 8000);
+        }
     }
 }
 
