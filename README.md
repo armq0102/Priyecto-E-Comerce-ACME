@@ -75,7 +75,7 @@ Plataforma de comercio electronico completa construida con Node.js, Express y Mo
                  ▼
 ┌─────────────────────────────────────────────────┐
 │  Backend API (Render)                           │
-│  priyecto-e-comerce-acme.onrender.com          │
+│  proyecto-e-commerce-acme.onrender.com        │
 │  • Node.js + Express                            │
 │  • Autenticación JWT                            │
 │  • Lógica de negocio                            │
@@ -206,7 +206,7 @@ CLOUDINARY_API_SECRET=tu_api_secret
 ## 🌍 Despliegue
 
 **Servicios utilizados:**
-- **Backend:** Render (https://priyecto-e-comerce-acme.onrender.com)
+- **Backend:** Render (https://proyecto-e-commerce-acme.onrender.com)
 - **Frontend:** Render (https://acme-1zib.onrender.com)
 - **Base de datos:** MongoDB Atlas
 - **Almacenamiento de imágenes:** Cloudinary
