@@ -107,9 +107,10 @@ function renderFeaturedProducts() {
             }
         }
         
-        // Agregar transición fade
+        // Agregar transición fade + slide
         featuredContainer.style.opacity = '0';
-        featuredContainer.style.transition = 'opacity 0.6s ease-in-out';
+        featuredContainer.style.transform = 'translateX(-30px)';
+        featuredContainer.style.transition = 'opacity 0.5s ease-in-out, transform 0.5s ease-in-out';
         
         setTimeout(() => {
             featuredContainer.innerHTML = featured.map(p => {
@@ -163,14 +164,15 @@ function renderFeaturedProducts() {
                 `;
             }).join('');
             
-            // Fade in después de actualizar
+            // Fade in + slide después de actualizar
             setTimeout(() => {
                 featuredContainer.style.opacity = '1';
+                featuredContainer.style.transform = 'translateX(0)';
             }, 50);
-        }, 300);
+        }, 250);
         
-        // Rotar productos cada 10 segundos
-        setTimeout(() => renderFeaturedProducts(), 10000);
+        // Rotar productos cada 3.5 segundos
+        setTimeout(() => renderFeaturedProducts(), 3500);
     }
 }
 
