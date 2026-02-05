@@ -1,13 +1,27 @@
 const { Router } = require('express');
 const mongoose = require('mongoose');
-const fs = require('fs');
 const path = require('path');
+const cloudinary = require('cloudinary').v2;
 const Product = require('../Product.model');
 const Order = require('../Order.model');
 const User = require('../User.model');
 const verifyToken = require('../auth.middleware');
 
 const router = Router();
+
+const hasCloudinaryConfig = () => (
+    !!process.env.CLOUDINARY_CLOUD_NAME &&
+    !!process.env.CLOUDINARY_API_KEY &&
+    !!process.env.CLOUDINARY_API_SECRET
+);
+
+if (hasCloudinaryConfig()) {
+    cloudinary.config({
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET
+    });
+}
 
 // Middleware: Verificar Token y Rol de Admin
 router.use(verifyToken);
@@ -32,29 +46,31 @@ const STATUS_FLOW = {
 // ==========================================
 
 // POST /api/admin/products/upload - Subir imagen
-router.post('/products/upload', (req, res) => {
+router.post('/products/upload', async (req, res) => {
     try {
         const { file, filename } = req.body;
-        
+
         if (!file || !filename) {
             return res.status(400).json({ ok: false, msg: 'Falta archivo o nombre' });
         }
 
-        // Decodificar base64 y guardar
-        const buffer = Buffer.from(file, 'base64');
-        const uploadsDir = path.join(__dirname, '../../images');
-        
-        // Crear carpeta si no existe
-        if (!fs.existsSync(uploadsDir)) {
-            fs.mkdirSync(uploadsDir, { recursive: true });
+        if (!hasCloudinaryConfig()) {
+            return res.status(500).json({ ok: false, msg: 'Cloudinary no está configurado' });
         }
 
-        const filepath = path.join(uploadsDir, filename);
-        fs.writeFileSync(filepath, buffer);
+        const ext = path.extname(filename).replace('.', '').toLowerCase();
+        const mimeExt = ext === 'jpg' ? 'jpeg' : (ext || 'jpeg');
+        const dataUri = `data:image/${mimeExt};base64,${file}`;
+        const publicId = path.parse(filename).name;
 
-        // Retornar ruta relativa para usar en el frontend
-        const imgPath = `/images/${filename}`;
-        res.json({ ok: true, imgPath });
+        const uploadResult = await cloudinary.uploader.upload(dataUri, {
+            folder: 'acme/products',
+            public_id: publicId,
+            overwrite: true,
+            resource_type: 'image'
+        });
+
+        res.json({ ok: true, imgPath: uploadResult.secure_url });
     } catch (error) {
         console.error('Error uploading file:', error);
         res.status(500).json({ ok: false, msg: 'Error al subir la imagen' });
@@ -236,6 +252,67 @@ router.patch('/users/:id/status', async (req, res) => {
         res.json({ ok: true, msg: `El estado del usuario ha sido actualizado.`, user });
     } catch (error) {
         res.status(500).json({ ok: false, msg: 'Error interno del servidor.' });
+    }
+});
+
+// ==========================================
+// ENDPOINT TEMPORAL: Migrar URLs a Cloudinary
+// ==========================================
+router.get('/migrate-cloudinary', async (req, res) => {
+    try {
+        if (!hasCloudinaryConfig()) {
+            return res.status(500).json({ ok: false, msg: 'Cloudinary no está configurado en el servidor' });
+        }
+
+        const products = await Product.find({});
+        let updated = 0;
+        let skipped = 0;
+        let errors = [];
+
+        for (const product of products) {
+            const img = product.img || '';
+
+            // Si ya es URL de Cloudinary, saltar
+            if (/cloudinary\.com/i.test(img)) {
+                skipped++;
+                continue;
+            }
+
+            // Si es URL local de Render (/images/xxx), extraer el nombre
+            if (img.startsWith('/images/') || img.startsWith('images/')) {
+                const filename = path.basename(img);
+                
+                // Construir URL de Cloudinary basada en el nombre del archivo
+                // Nota: Las imágenes YA deben estar subidas a Cloudinary
+                const cloudUrl = `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/acme/products/${encodeURIComponent(filename)}`;
+                
+                try {
+                    product.img = cloudUrl;
+                    await product.save();
+                    updated++;
+                } catch (error) {
+                    errors.push({ product: product.title, error: error.message });
+                }
+            } else {
+                skipped++;
+            }
+        }
+
+        res.json({
+            ok: true,
+            msg: 'Migración completada',
+            stats: {
+                total: products.length,
+                updated,
+                skipped,
+                errors: errors.length
+            },
+            errors
+        });
+
+    } catch (error) {
+        console.error('Error en migración:', error);
+        res.status(500).json({ ok: false, msg: 'Error en la migración', error: error.message });
     }
 });
 
