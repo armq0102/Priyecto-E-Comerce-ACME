@@ -2,6 +2,14 @@
 
 // --- CONFIGURACIÓN DE ENTORNO ---
 const API_URL = 'https://priyecto-e-comerce-acme.onrender.com/api';
+const API_BASE_URL = API_URL.replace(/\/api\/?$/, '');
+
+function resolveImageUrl(img) {
+    if (!img) return '';
+    if (/^https?:\/\//i.test(img)) return img;
+    if (img.startsWith('/')) return `${API_BASE_URL}${img}`;
+    return `${API_BASE_URL}/${img}`;
+}
 
 // Base de datos de productos (Coincide con los IDs de tus HTMLs)
 let PRODUCTS = []; // Ahora vacío, se llena desde el backend
@@ -76,7 +84,7 @@ function renderFeaturedProducts() {
                 <div style="position: relative;">
                     ${isOutOfStock ? '<span class="badge-out-of-stock">Agotado</span>' : ''}
                     <span class="category-tag" style="position: absolute; top: 10px; right: 10px; background: ${categoryColor}; color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.75em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; z-index: 10; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">${categoryTag}</span>
-                    <img src="${p.img}" alt="${p.title}">
+                    <img src="${resolveImageUrl(p.img)}" alt="${p.title}">
                 </div>
                 <h3>${p.title}</h3>
                 <p class="price">${formatCOP(p.price)}</p>
@@ -311,7 +319,7 @@ function updateCartUI() {
         } else {
             drawerContent.innerHTML = cart.map(item => `
                 <div class="cart-item">
-                    <img src="${item.img}" alt="${item.title}">
+                    <img src="${resolveImageUrl(item.img)}" alt="${item.title}">
                     <div class="meta">
                         <div class="title">${item.title}</div>
                         <div class="price">${formatCOP(item.price)}</div>

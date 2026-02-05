@@ -1,5 +1,13 @@
 // --- CONFIGURATION ---
 const API_URL = 'https://priyecto-e-comerce-acme.onrender.com/api';
+const API_BASE_URL = API_URL.replace(/\/api\/?$/, '');
+
+function resolveImageUrl(img) {
+    if (!img) return '';
+    if (/^https?:\/\//i.test(img)) return img;
+    if (img.startsWith('/')) return `${API_BASE_URL}${img}`;
+    return `${API_BASE_URL}/${img}`;
+}
 
 // --- STATE ---
 let currentProductToEdit = null;
@@ -187,7 +195,7 @@ const AdminUI = {
                 const productId = p._id || p.id;
                 return `
                 <tr>
-                    <td><img src="${p.img}" class="product-thumb" alt="img"></td>
+                    <td><img src="${resolveImageUrl(p.img)}" class="product-thumb" alt="img"></td>
                     <td>
                         <div style="font-weight:600">${p.title}</div>
                         <small style="color:#888">ID: ${productId}</small>
