@@ -57,6 +57,44 @@ Plataforma de comercio electronico completa construida con Node.js, Express y Mo
 - Wompi API
 - crypto (SHA-256)
 
+**Almacenamiento**
+- Cloudinary (imágenes de productos)
+
+---
+
+## 🏗️ Arquitectura de producción
+
+```
+┌─────────────────────────────────────────────────┐
+│  Frontend (Render)                              │
+│  acme-1zib.onrender.com                         │
+│  • HTML/CSS/JS estáticos                        │
+│  • Panel de administración                      │
+└────────────────┬────────────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────────────┐
+│  Backend API (Render)                           │
+│  priyecto-e-comerce-acme.onrender.com          │
+│  • Node.js + Express                            │
+│  • Autenticación JWT                            │
+│  • Lógica de negocio                            │
+└───┬─────────────────────┬───────────────────┬───┘
+    │                     │                   │
+    ▼                     ▼                   ▼
+┌─────────┐      ┌──────────────┐    ┌─────────────┐
+│ MongoDB │      │  Cloudinary  │    │   Wompi     │
+│  Atlas  │      │  (Imágenes)  │    │  (Pagos)    │
+└─────────┘      └──────────────┘    └─────────────┘
+```
+
+**Ventajas de esta arquitectura:**
+- ✅ Imágenes permanentes (no se pierden en reinicios de Render)
+- ✅ Base de datos escalable en la nube
+- ✅ Despliegue automático con Git push
+- ✅ Separación de responsabilidades
+- ✅ Lista para producción real
+
 ---
 
 ## 📋 Requisitos previos
@@ -109,12 +147,19 @@ MONGO_URI=mongodb+srv://...
 JWT_SECRET=tu_secreto
 FRONTEND_URL=https://tu-frontend.com
 
-# Wompi
+# Wompi (Pagos)
 WOMPI_PUBLIC_KEY=...
 WOMPI_INTEGRITY_SECRET=...
 WOMPI_PUBLIC_KEY_TEST=...
 WOMPI_INTEGRITY_SECRET_TEST=...
+
+# Cloudinary (Almacenamiento de imágenes)
+CLOUDINARY_CLOUD_NAME=tu_cloud_name
+CLOUDINARY_API_KEY=tu_api_key
+CLOUDINARY_API_SECRET=tu_api_secret
 ```
+
+**Nota:** Las imágenes de productos se suben automáticamente a Cloudinary desde el panel de administración. No es necesario guardar archivos localmente en el servidor.
 
 ---
 
@@ -159,9 +204,25 @@ WOMPI_INTEGRITY_SECRET_TEST=...
 ---
 
 ## 🌍 Despliegue
-- Backend: Render / Railway / Vercel / Heroku
-- Base de datos: MongoDB Atlas
-- Secretos: variables de entorno en la plataforma
+
+**Servicios utilizados:**
+- **Backend:** Render (https://priyecto-e-comerce-acme.onrender.com)
+- **Frontend:** Render (https://acme-1zib.onrender.com)
+- **Base de datos:** MongoDB Atlas
+- **Almacenamiento de imágenes:** Cloudinary
+- **Pagos:** Wompi
+
+**Configuración en Render:**
+1. Conectar repositorio de GitHub
+2. Configurar variables de entorno (ver sección anterior)
+3. Build Command: `npm install`
+4. Start Command: `node server.js`
+5. Auto-deploy habilitado (cada push a main despliega automáticamente)
+
+**Importante:** 
+- No es necesario correr el servidor localmente para desarrollo
+- Edita código → git push → Render redespliega automáticamente
+- Las imágenes se guardan en Cloudinary (permanentes)
 
 ---
 
