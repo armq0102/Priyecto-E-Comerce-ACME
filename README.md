@@ -163,6 +163,15 @@ Incluye pruebas de:
 
 ---
 
+## 📌 Estado del proyecto
+
+Este proyecto se encuentra desplegado en entorno sandbox con fines academicos y de simulacion profesional.
+Las decisiones tecnicas priorizan claridad, robustez y aprendizaje de practicas reales (pagos, webhooks, validacion, tests).
+
+El diseno contempla produccion real, con un roadmap claro para endurecimiento adicional (cookies httpOnly, cache distribuido, colas, CSP).
+
+---
+
 ## ⚙️ Variables de entorno
 
 ```bash
