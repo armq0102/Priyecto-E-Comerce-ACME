@@ -34,7 +34,9 @@ body {
 }
 
 .category-page.container {
-    max-width: 1032px;
+    max-width: 100%;
+    padding-left: 20px;
+    padding-right: 20px;
 }
 .section-block--tight {
     margin: 48px 0 32px;
@@ -1226,26 +1228,29 @@ body {
 
 /* Productos grid para páginas de categoría */
 .products-grid {
-    display: inline-grid;
-    grid-template-columns: repeat(auto-fit, 240px);
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     column-gap: 24px;
     row-gap: 32px;
     justify-content: center;
     box-sizing: border-box;
-    width: auto;
-    max-width: 100%;
+    width: 1032px;
+    max-width: calc(100% - 32px);
     margin: 24px auto;
-    padding: 0;
+    padding: 0 16px;
     font-family: "Inter", "Roboto", "Helvetica", sans-serif;
 }
 
 .products-grid-wrap {
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    width: 100%;
 }
 
 @media (max-width: 1024px) {
     .products-grid {
-        grid-template-columns: repeat(auto-fit, minmax(220px, 220px));
+        width: 464px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         row-gap: 28px;
     }
 
