@@ -173,9 +173,10 @@ body {
 }
 
 .header-content {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
     align-items: center;
+    gap: 24px;
 }
 
 .logo {
@@ -185,11 +186,17 @@ body {
     color: var(--acme-red);
 }
 
+.main-nav {
+    display: flex;
+    justify-content: center;
+}
+
 .main-nav ul {
     list-style: none;
     margin: 0;
     padding: 0;
     display: flex;
+    justify-content: center;
 }
 
 .main-nav li {
@@ -211,6 +218,7 @@ body {
     display: flex;
     gap: 12px;
     align-items: center;
+    justify-content: flex-end;
 }
 
 .user-menu {
@@ -263,9 +271,13 @@ body {
 /* --- RESPONSIVE HEADER (Móvil) --- */
 @media (max-width: 850px) {
     .header-content {
-        flex-direction: column;
+        grid-template-columns: 1fr;
         text-align: center;
         gap: 15px;
+    }
+
+    .main-nav {
+        width: 100%;
     }
 
     .main-nav ul {
@@ -280,6 +292,7 @@ body {
 
     .header-icons {
         justify-content: center;
+        margin-left: 0;
     }
 }
 
@@ -1205,19 +1218,21 @@ body {
 /* Productos grid para páginas de categoría */
 .products-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(240px, 260px));
     column-gap: 24px;
     row-gap: 32px;
     max-width: 1200px;
     margin: 24px auto 0;
     padding: 0 16px;
     font-family: "Inter", "Roboto", "Helvetica", sans-serif;
+    justify-content: center;
 }
 
 @media (max-width: 1024px) {
     .products-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(240px, 260px));
         row-gap: 28px;
+        justify-content: center;
     }
 
     .product-card .add-to-cart {
@@ -1228,8 +1243,9 @@ body {
 
 @media (max-width: 640px) {
     .products-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(240px, 1fr);
         row-gap: 24px;
+        justify-content: center;
     }
 
     .product-card .add-to-cart {
