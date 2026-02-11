@@ -1309,6 +1309,7 @@ body {
     object-position: center;
     border-radius: 0;
     box-shadow: none;
+    transition: opacity 1200ms ease;
 }
 .hero-cta {
     position: absolute;

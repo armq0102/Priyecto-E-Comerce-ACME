@@ -611,6 +611,33 @@ window.handleCheckout = async function() {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Hero banner rotator (index only)
+    const heroImage = document.querySelector('.hero-image');
+    if (heroImage) {
+        const heroImages = [
+            'images/banner-basicos.png',
+            'images/Banner-inicio2.png'
+        ];
+        let heroIndex = heroImages.indexOf(heroImage.getAttribute('src'));
+        if (heroIndex < 0) heroIndex = 0;
+
+        setInterval(() => {
+            heroIndex = (heroIndex + 1) % heroImages.length;
+            heroImage.style.opacity = '0.5';
+            const nextSrc = heroImages[heroIndex];
+
+            const handleLoad = () => {
+                heroImage.removeEventListener('load', handleLoad);
+                heroImage.style.opacity = '1';
+            };
+
+            setTimeout(() => {
+                heroImage.addEventListener('load', handleLoad);
+                heroImage.setAttribute('src', nextSrc);
+            }, 600);
+        }, 8000);
+    }
+
     // 1. Cargar estado del carrito
     updateCartUI();
 
