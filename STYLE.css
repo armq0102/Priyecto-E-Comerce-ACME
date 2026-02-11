@@ -1286,15 +1286,17 @@ body {
 .hero-grid img { width: 100%; height: 160px; object-fit: cover; border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,0.06); }
 
 /* Nueva portada principal (hero banner) */
-.hero-banner { margin: 18px 0; }
-.hero-cover { position: relative; max-width: 1200px; margin: 0 auto; }
+.hero-banner { margin: 0; }
+.hero-cover { position: relative; width: 100%; max-width: none; }
 .hero-image {
+    display: block;
     width: 100%;
-    height: 520px;
-    background-size: cover;
-    background-position: center center;
-    border-radius: 8px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+    height: 70vh;
+    min-height: 360px;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 0;
+    box-shadow: none;
 }
 .hero-cta {
     position: absolute;
@@ -1320,31 +1322,33 @@ body {
     position: absolute;
     inset: 0; /* full cover of hero-cover */
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: center;
+    padding: 24px;
     pointer-events: none; /* allow clicks pass through default; CTA will override */
     z-index: 6;
 }
 .hero-overlay-inner {
-    max-width: 920px;
+    max-width: 720px;
+    width: 100%;
     text-align: center;
-    padding: 28px;
-    background: linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.45));
-    border-radius: 8px;
+    padding: 20px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.2), rgba(0,0,0,0.35));
+    border-radius: 6px;
     pointer-events: auto; /* enable interaction for inner content */
     animation: heroFadeIn 700ms ease both;
 }
 .hero-title {
     font-family: 'Playfair Display', serif;
     color: #fff;
-    font-size: 2.6rem;
+    font-size: 2.2rem;
     letter-spacing: 1px;
     margin: 0 0 10px 0;
     text-shadow: 0 6px 18px rgba(0,0,0,0.5);
 }
 .hero-subtitle {
     color: rgba(255,255,255,0.9);
-    font-size: 1.05rem;
+    font-size: 1rem;
     margin: 0 0 18px 0;
 }
 .hero-cta-center { display:flex; gap:12px; justify-content:center; }
@@ -1363,18 +1367,19 @@ body {
 @media (max-width: 640px) { .hero-grid { grid-template-columns: repeat(2, 1fr); } .hero-grid img{height:120px;} }
 
 @media (max-width: 900px) {
-    .hero-image { height: 320px; }
+    .hero-image { height: 55vh; min-height: 300px; }
     .hero-cta { left: 16px; bottom: 18px; }
 }
 
 @media (max-width: 480px) {
-    .hero-image { height: 220px; }
+    .hero-image { height: 45vh; min-height: 240px; }
     .hero-cta { flex-direction: column; gap: 8px; left: 12px; }
 }
 
 @media (max-width: 640px) {
-    .hero-overlay-inner { padding: 18px; }
-    .hero-title { font-size: 1.4rem; }
+    .hero-overlay { padding: 16px; }
+    .hero-overlay-inner { padding: 16px; }
+    .hero-title { font-size: 1.35rem; }
     .hero-subtitle { font-size: 0.95rem; }
     .hero-cta-center { flex-direction: column; }
 }
