@@ -267,4 +267,4 @@ MIT
 
 **ACME E-commerce Platform**
 Proyecto universitario con enfoque profesional • 2026
-Desarrollado por: Maria Ramirez
+Desarrollado por: Anthony Martinez 
